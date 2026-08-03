@@ -1,0 +1,275 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  Star, Download, ShieldCheck, Server, Wallet, Gauge, Target,
+  TrendingUp, ArrowLeft, Check,
+} from "lucide-react";
+import { getBotBySlug, getBots, getDeveloper } from "@/lib/data";
+import { Sparkline } from "@/components/bots/sparkline";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { formatCompact, formatUsd } from "@/lib/utils";
+
+export async function generateStaticParams() {
+  const bots = await getBots();
+  return bots.map((b) => ({ slug: b.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const bot = await getBotBySlug(slug);
+  if (!bot) return { title: "Bot not found" };
+  return {
+    title: bot.name,
+    description: bot.tagline,
+  };
+}
+
+function StatBlock({ icon: Icon, label, value, sub }: { icon: React.ElementType; label: string; value: string; sub?: string }) {
+  return (
+    <div className="glass rounded-2xl p-4">
+      <div className="flex items-center gap-2 text-muted text-xs uppercase tracking-wide">
+        <Icon className="size-3.5" /> {label}
+      </div>
+      <div className="mt-2 text-2xl font-semibold font-display tabular-nums">{value}</div>
+      {sub && <div className="text-xs text-muted mt-0.5">{sub}</div>}
+    </div>
+  );
+}
+
+export default async function BotDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const bot = await getBotBySlug(slug);
+  if (!bot) notFound();
+
+  const developer = await getDeveloper(bot.developer);
+  const finalEquity = bot.equity[bot.equity.length - 1]?.v ?? 0;
+  const startEquity = bot.equity[0]?.v ?? 1;
+  const totalReturn = ((finalEquity - startEquity) / startEquity) * 100;
+
+  // Available purchase plans — only those with a price > 0.
+  type Plan = { plan: "buy" | "rent" | "annual"; label: string; price: number; suffix: string };
+  const plans: Plan[] = [
+    bot.priceBuy > 0 && { plan: "buy" as const, label: "Buy license", price: bot.priceBuy, suffix: "one-time" },
+    bot.priceRent > 0 && { plan: "rent" as const, label: "Rent monthly", price: bot.priceRent, suffix: "/mo" },
+    bot.priceAnnual > 0 && { plan: "annual" as const, label: "Annual", price: bot.priceAnnual, suffix: "/yr" },
+  ].filter(Boolean) as Plan[];
+  if (plans.length === 0) {
+    plans.push({ plan: "buy", label: "Get it free", price: 0, suffix: "free" });
+  }
+  const primary = plans[0];
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: bot.name,
+    description: bot.tagline,
+    brand: { "@type": "Brand", name: developer?.name ?? "Botico" },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: bot.rating,
+      reviewCount: bot.reviews,
+    },
+    offers: {
+      "@type": "Offer",
+      price: bot.priceBuy,
+      priceCurrency: "USD",
+    },
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-28 pb-28 lg:pb-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      <Link href="/marketplace" className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors">
+        <ArrowLeft className="size-4" /> Back to marketplace
+      </Link>
+
+      <div className="mt-6 grid lg:grid-cols-[1fr_360px] gap-8">
+        {/* Main */}
+        <div>
+          {/* Header */}
+          <div className="relative overflow-hidden rounded-[var(--radius)] glass p-6 sm:p-8">
+            <div className="absolute -right-16 -top-16 size-64 rounded-full blur-3xl opacity-30" style={{ background: bot.accent }} />
+            <div className="relative">
+              <div className="flex flex-wrap items-center gap-2">
+                {bot.verified && (
+                  <Badge variant="cyan"><ShieldCheck className="size-3" /> Verified</Badge>
+                )}
+                <Badge variant={bot.kind === "crypto" ? "violet" : "default"}>
+                  {bot.kind === "crypto" ? "Crypto bot" : "Forex bot"}
+                </Badge>
+                {bot.categories.slice(0, 3).map((c) => (
+                  <Badge key={c}>{c}</Badge>
+                ))}
+              </div>
+              <h1 className="mt-4 font-display text-4xl font-bold tracking-tight">{bot.name}</h1>
+              <p className="mt-2 text-muted max-w-2xl">{bot.tagline}</p>
+              <div className="mt-4 flex items-center gap-5 text-sm text-muted">
+                <span className="flex items-center gap-1.5">
+                  <span className="grid place-items-center size-7 rounded-lg bg-white/5 text-xs font-bold">
+                    {developer?.avatar ?? "BO"}
+                  </span>
+                  {developer?.name ?? bot.developer}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Star className="size-4 fill-warning text-warning" /> {bot.rating.toFixed(1)}
+                  <span className="text-muted/70">({formatCompact(bot.reviews)})</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Download className="size-4" /> {formatCompact(bot.downloads)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Performance */}
+          <div className="mt-6 rounded-[var(--radius)] glass p-6 sm:p-8">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl font-semibold">Equity curve</h2>
+              <Badge variant="success"><TrendingUp className="size-3" /> +{totalReturn.toFixed(1)}% total</Badge>
+            </div>
+            <div className="mt-4">
+              <Sparkline data={bot.equity} id={`detail-${bot.slug}`} height={220} stroke="#22d3ee" />
+            </div>
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <StatBlock icon={TrendingUp} label="Monthly" value={`+${bot.monthlyReturn}%`} />
+              <StatBlock icon={Gauge} label="Max DD" value={`${bot.maxDrawdown}%`} />
+              <StatBlock icon={Target} label="Win rate" value={`${bot.winRate}%`} />
+              <StatBlock icon={Target} label="Avg RR" value={`1:${bot.avgRR}`} />
+            </div>
+          </div>
+
+          {/* Specs */}
+          <div className="mt-6 grid sm:grid-cols-2 gap-6">
+            <div className="rounded-[var(--radius)] glass p-6">
+              <h3 className="font-semibold flex items-center gap-2"><Server className="size-4 text-cyan-bright" /> Supported brokers</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {bot.platforms.map((p) => <Badge key={p}>{p}</Badge>)}
+              </div>
+              <h3 className="mt-6 font-semibold flex items-center gap-2"><Target className="size-4 text-cyan-bright" /> Supported assets</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {bot.assets.map((a) => <Badge key={a} variant="cyan">{a}</Badge>)}
+              </div>
+            </div>
+            <div className="rounded-[var(--radius)] glass p-6">
+              <h3 className="font-semibold flex items-center gap-2"><Wallet className="size-4 text-cyan-bright" /> Requirements</h3>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div className="flex justify-between"><dt className="text-muted">Minimum balance</dt><dd className="font-medium">{formatUsd(bot.minBalance)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted">Recommended risk</dt><dd className="font-medium">{bot.recommendedRisk}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted">Reviews</dt><dd className="font-medium">{formatCompact(bot.reviews)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted">Total downloads</dt><dd className="font-medium">{formatCompact(bot.downloads)}</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          {/* Installation */}
+          <div className="mt-6 rounded-[var(--radius)] glass p-6 sm:p-8">
+            <h3 className="font-display text-xl font-semibold">Installation guide</h3>
+            <ol className="mt-4 space-y-3">
+              {[
+                "Choose Buy or Rent and complete secure checkout.",
+                "Download your bot files and license key instantly.",
+                "Drop the EA into your MT4/MT5, cTrader or exchange account.",
+                "Apply the recommended risk preset and you're live.",
+              ].map((step, i) => (
+                <li key={i} className="flex gap-3 text-sm">
+                  <span className="grid place-items-center size-6 shrink-0 rounded-full bg-cyan/15 text-cyan-bright text-xs font-semibold">{i + 1}</span>
+                  <span className="text-muted">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* Deploy sidebar */}
+        <aside className="lg:sticky lg:top-24 h-max">
+          <div className="rounded-[var(--radius)] glass-strong p-6">
+            <div className="flex items-baseline justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted">{primary.label}</div>
+                <div className="font-display text-3xl font-bold">
+                  {primary.price === 0 ? "Free" : formatUsd(primary.price)}
+                  <span className="text-sm text-muted font-normal"> {primary.suffix}</span>
+                </div>
+              </div>
+              {plans[1] && (
+                <div className="text-right">
+                  <div className="text-xs uppercase tracking-wide text-muted">{plans[1].label}</div>
+                  <div className="font-display text-xl font-semibold">{formatUsd(plans[1].price)}<span className="text-sm text-muted font-normal"> {plans[1].suffix}</span></div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-5 space-y-2">
+              {plans.map((p, i) => (
+                <Button key={p.plan} asChild size="lg" variant={i === 0 ? "primary" : "secondary"} className="w-full">
+                  <Link href={`/checkout?type=bot&slug=${bot.slug}&plan=${p.plan}`}>
+                    {p.price === 0 ? "Get it free" : `${p.label} · ${formatUsd(p.price)}`}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+
+            <ul className="mt-6 space-y-2.5 text-sm">
+              {[
+                "Instant delivery & license key",
+                "Works on MT4, MT5 & cTrader",
+                "Free updates & version history",
+                "30-day money-back guarantee",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2 text-muted">
+                  <Check className="size-4 text-success" /> {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {developer && (
+            <div className="mt-4 rounded-[var(--radius)] glass p-6">
+              <div className="flex items-center gap-3">
+                <span className="grid place-items-center size-11 rounded-xl bg-gradient-to-br from-cyan to-blue text-[#03121a] font-bold">
+                  {developer.avatar}
+                </span>
+                <div>
+                  <div className="font-semibold flex items-center gap-1">
+                    {developer.name}
+                    {developer.verified && <ShieldCheck className="size-4 text-cyan-bright" />}
+                  </div>
+                  <div className="text-xs text-muted">
+                    {developer.bots} bots · {formatCompact(developer.followers)} followers
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {/* Mobile sticky buy bar */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl px-4 py-3 flex items-center gap-3">
+        <div className="min-w-0">
+          <div className="text-[10px] uppercase tracking-wide text-muted">{primary.label}</div>
+          <div className="font-display text-lg font-bold leading-none">
+            {primary.price === 0 ? "Free" : formatUsd(primary.price)}
+            <span className="text-xs text-muted font-normal"> {primary.suffix}</span>
+          </div>
+        </div>
+        <Button asChild size="lg" className="flex-1">
+          <Link href={`/checkout?type=bot&slug=${bot.slug}&plan=${primary.plan}`}>
+            {primary.price === 0 ? "Get it free" : "Get this bot"}
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,179 @@
+// Botico — Prisma schema (PostgreSQL)
+// Run: npx prisma migrate dev && npx prisma db seed
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* ----------------------------- Auth.js ----------------------------- */
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(TRADER)
+  createdAt     DateTime  @default(now())
+
+  accounts      Account[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  reviews       Review[]
+  favorites     Favorite[]
+  developer     Developer?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  TRADER
+  DEVELOPER
+  ADMIN
+}
+
+/* --------------------------- Marketplace --------------------------- */
+
+model Developer {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  name      String
+  avatar    String
+  verified  Boolean @default(false)
+  followers Int     @default(0)
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
+
+  bots Bot[]
+}
+
+model Category {
+  id    String @id @default(cuid())
+  slug  String @unique
+  name  String
+  group String
+  icon  String
+  blurb String
+
+  bots BotCategory[]
+}
+
+model Bot {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  tagline         String
+  platforms       String[]
+  assets          String[]
+  rating          Float    @default(0)
+  reviews         Int      @default(0)
+  downloads       Int      @default(0)
+  monthlyReturn   Float    @default(0)
+  maxDrawdown     Float    @default(0)
+  winRate         Float    @default(0)
+  avgRR           Float    @default(0)
+  minBalance      Int      @default(0)
+  recommendedRisk String
+  priceBuy        Int      @default(0)
+  priceRent       Int      @default(0)
+  featured        Boolean  @default(false)
+  verified        Boolean  @default(false)
+  accent          String
+  equity          Json
+  createdAt       DateTime @default(now())
+
+  developerId String
+  developer   Developer @relation(fields: [developerId], references: [id])
+
+  categories    BotCategory[]
+  subscriptions Subscription[]
+  reviewList    Review[]
+  favorites     Favorite[]
+}
+
+model BotCategory {
+  botId      String
+  categoryId String
+  bot        Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([botId, categoryId])
+}
+
+model Subscription {
+  id        String           @id @default(cuid())
+  userId    String
+  botId     String
+  plan      SubscriptionPlan
+  status    String           @default("active")
+  createdAt DateTime         @default(now())
+  renewsAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot  Bot  @relation(fields: [botId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionPlan {
+  RENT
+  BUY
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  botId     String
+  rating    Int
+  body      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot  Bot  @relation(fields: [botId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  userId String
+  botId  String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot    Bot  @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@id([userId, botId])
+}
