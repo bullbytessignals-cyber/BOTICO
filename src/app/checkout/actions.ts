@@ -1,6 +1,7 @@
 "use server";
 
 import { createPayment, uploadProof } from "@/lib/payments";
+import { CUSTOM_CONFIG_FEE } from "@/lib/payments-config";
 import { revalidatePath } from "next/cache";
 
 export interface CheckoutState {
@@ -53,12 +54,18 @@ export async function submitPayment(_prev: CheckoutState, fd: FormData): Promise
 
   const fullContact = countryCode ? `${countryCode} ${contact}` : contact;
 
+  // Optional custom configuration add-on (+$10 one-time).
+  const customConfig = get("customConfig") === "1";
+  const customConfigDetails = get("customConfigDetails");
+  const baseAmount = Number(get("amount")) || 0;
+  const amount = baseAmount + (customConfig ? CUSTOM_CONFIG_FEE : 0);
+
   const res = await createPayment({
     itemType: get("itemType") || "bot",
     itemSlug: get("itemSlug"),
     itemName: get("itemName") || "Order",
     itemKind,
-    amount: Number(get("amount")) || 0,
+    amount,
     coin,
     name,
     countryCode,
@@ -69,6 +76,7 @@ export async function submitPayment(_prev: CheckoutState, fd: FormData): Promise
     mt5Server: itemKind === "forex" ? mt5Server : undefined,
     binanceApiKey: itemKind === "crypto" ? binanceApiKey : undefined,
     binanceApiSecret: itemKind === "crypto" ? binanceApiSecret : undefined,
+    customConfig: customConfig ? (customConfigDetails || "Custom configuration requested") : undefined,
     txHash,
     proofUrl,
   });

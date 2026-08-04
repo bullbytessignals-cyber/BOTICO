@@ -65,6 +65,7 @@ export default async function CheckoutPage({
         planLabel,
         kind: "forex" as const,
         collectSetup: true,
+        allowCustomConfig: true,
       };
     }
   } else {
@@ -82,6 +83,7 @@ export default async function CheckoutPage({
         planLabel,
         kind: bot.kind,
         collectSetup: true,
+        allowCustomConfig: true,
       };
     }
   }

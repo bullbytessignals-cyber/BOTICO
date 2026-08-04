@@ -49,3 +49,6 @@ export const CRYPTO_METHODS: CryptoMethod[] = [
 
 export const PAYMENT_STATUSES = ["pending", "approved", "rejected"] as const;
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+
+/** One-time fee for custom bot configuration (partial closes, TP/SL, break-even, execution). */
+export const CUSTOM_CONFIG_FEE = 10;

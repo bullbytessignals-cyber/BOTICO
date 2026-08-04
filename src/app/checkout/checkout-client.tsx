@@ -3,11 +3,11 @@
 import { useActionState, useState } from "react";
 import {
   Copy, Check, CheckCircle2, AlertCircle, Loader2, ShieldCheck, Upload, Wallet,
-  KeyRound, Server, BadgeCheck, ImageIcon,
+  KeyRound, Server, BadgeCheck, ImageIcon, SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { CryptoMethod } from "@/lib/payments-config";
+import { type CryptoMethod, CUSTOM_CONFIG_FEE } from "@/lib/payments-config";
 import { COUNTRY_CODES } from "@/lib/country-codes";
 import { submitPayment, type CheckoutState } from "./actions";
 
@@ -19,6 +19,7 @@ interface Item {
   planLabel: string;
   kind: "forex" | "crypto";
   collectSetup?: boolean; // false for custom builds (bot delivered later)
+  allowCustomConfig?: boolean; // offer the +$10 custom configuration add-on
 }
 
 const input = "w-full h-11 px-4 rounded-xl bg-black/20 border border-border text-sm outline-none focus:ring-2 focus:ring-cyan/50 placeholder:text-muted/60";
@@ -36,9 +37,12 @@ export function CheckoutClient({
   const [copied, setCopied] = useState(false);
   const [dial, setDial] = useState(COUNTRY_CODES[0].dial);
   const [proofName, setProofName] = useState("");
+  const [customConfig, setCustomConfig] = useState(false);
   const method = methods.find((m) => m.id === methodId) ?? methods[0];
   const isCrypto = item.kind === "crypto";
   const collectSetup = item.collectSetup !== false;
+  const allowCustomConfig = item.allowCustomConfig === true;
+  const total = item.amount + (customConfig ? CUSTOM_CONFIG_FEE : 0);
 
   const copy = async () => {
     try {
@@ -83,7 +87,10 @@ export function CheckoutClient({
             </div>
             <div className="text-right">
               <div className="text-xs uppercase tracking-wide text-muted">Amount</div>
-              <div className="font-display text-2xl font-bold">${item.amount.toFixed(2)}</div>
+              <div className="font-display text-2xl font-bold">${total.toFixed(2)}</div>
+              {customConfig && (
+                <div className="text-[11px] text-cyan-bright">incl. +${CUSTOM_CONFIG_FEE} custom config</div>
+              )}
             </div>
           </div>
         </div>
@@ -124,7 +131,7 @@ export function CheckoutClient({
               </div>
             </div>
             <p className="mt-4 text-xs text-muted">
-              Send exactly <span className="text-foreground font-semibold">${item.amount.toFixed(2)}</span> worth of {method.label.split(" ")[0]} to the address above, then submit the form with your transaction hash and a screenshot.
+              Send exactly <span className="text-foreground font-semibold">${total.toFixed(2)}</span> worth of {method.label.split(" ")[0]} to the address above, then submit the form with your transaction hash and a screenshot.
             </p>
           </div>
 
@@ -192,6 +199,39 @@ export function CheckoutClient({
               <input name="mt5Password" className={input} placeholder="MT5 password" />
               <input name="mt5Server" className={input} placeholder="MT5 server" />
             </div>
+          </div>
+        )}
+
+        {/* Custom configuration add-on (+$10) */}
+        {allowCustomConfig && (
+          <div className="rounded-2xl border border-cyan/30 bg-cyan/5 p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="customConfig"
+                value="1"
+                checked={customConfig}
+                onChange={(e) => setCustomConfig(e.target.checked)}
+                className="mt-1 accent-cyan size-4"
+              />
+              <span>
+                <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <SlidersHorizontal className="size-4 text-cyan-bright" /> Add custom configuration
+                  <span className="text-cyan-bright font-semibold">+${CUSTOM_CONFIG_FEE}</span>
+                </span>
+                <span className="block text-xs text-muted mt-0.5">
+                  One-time setup — tune the bot to your style: partial closes, TP/SL, break-even & execution.
+                </span>
+              </span>
+            </label>
+            {customConfig && (
+              <textarea
+                name="customConfigDetails"
+                rows={5}
+                className="mt-3 w-full px-4 py-3 rounded-xl bg-black/20 border border-border text-sm outline-none focus:ring-2 focus:ring-cyan/50 resize-y placeholder:text-muted/60"
+                placeholder={"Tell us your preferences, e.g.\n• Partial close %: TP1 50%, TP2 30%\n• TP & SL management: move SL to TP1 after TP2\n• Break-even rules: BE after +15 pips\n• Execution: only London/NY session"}
+              />
+            )}
           </div>
         )}
 

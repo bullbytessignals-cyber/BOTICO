@@ -1,4 +1,4 @@
-import { Mail, ExternalLink, Server, KeyRound, Hash, Wallet } from "lucide-react";
+import { Mail, ExternalLink, Server, KeyRound, Hash, Wallet, SlidersHorizontal } from "lucide-react";
 import { listPayments, type Payment } from "@/lib/payments";
 import { PAYMENT_STATUSES, type PaymentStatus } from "@/lib/payments-config";
 import { Badge } from "@/components/ui/badge";
@@ -121,6 +121,14 @@ export default async function AdminPaymentsPage() {
                           <Detail icon={KeyRound} label="MT5 password" value={p.mt5Password} mono />
                           <Detail icon={Wallet} label="MT5 server" value={p.mt5Server} />
                         </>
+                      )}
+                      {p.customConfig && (
+                        <div className="mt-2 rounded-xl border border-cyan/30 bg-cyan/5 p-3">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-cyan-bright">
+                            <SlidersHorizontal className="size-3.5" /> Custom configuration (+$10)
+                          </div>
+                          <p className="mt-1 text-sm text-foreground whitespace-pre-wrap">{p.customConfig}</p>
+                        </div>
                       )}
                     </div>
 

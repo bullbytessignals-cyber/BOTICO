@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
   verifyAdminPassword,
+  isAdminConfigured,
   updateOrderStatus,
   type OrderStatus,
 } from "@/lib/orders";
@@ -21,6 +22,9 @@ export interface LoginState {
 export async function adminLogin(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const pw = String(formData.get("password") ?? "");
   if (!pw) return { error: "Enter the admin password." };
+  if (!isAdminConfigured()) {
+    return { error: "Server has no ADMIN_PASSWORD set — add it in Vercel → Settings → Environment Variables (Production), then redeploy." };
+  }
   if (!verifyAdminPassword(pw)) {
     return { error: "Wrong password." };
   }

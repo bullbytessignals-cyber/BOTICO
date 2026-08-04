@@ -94,8 +94,18 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
   return { ok: true };
 }
 
+/** The configured admin password, tolerant of accidental surrounding quotes/whitespace. */
+function adminPassword(): string {
+  return (process.env.ADMIN_PASSWORD ?? "").trim().replace(/^["']|["']$/g, "");
+}
+
+/** True when an ADMIN_PASSWORD is actually configured on the server. */
+export function isAdminConfigured(): boolean {
+  return adminPassword().length > 0;
+}
+
 /** Admin auth — compares against the ADMIN_PASSWORD env var. */
 export function verifyAdminPassword(pw: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
-  return Boolean(expected) && pw === expected;
+  const expected = adminPassword();
+  return expected.length > 0 && pw.trim() === expected;
 }

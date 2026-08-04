@@ -22,6 +22,7 @@ export interface PaymentInput {
   // Crypto bots → Binance API credentials
   binanceApiKey?: string;
   binanceApiSecret?: string;
+  customConfig?: string; // custom configuration details (+$10 add-on)
   txHash?: string;
   proofUrl?: string;
 }
@@ -67,6 +68,7 @@ export async function createPayment(input: PaymentInput): Promise<Result> {
     mt5_server: input.mt5Server ?? null,
     binance_api_key: input.binanceApiKey ?? null,
     binance_api_secret: input.binanceApiSecret ?? null,
+    custom_config: input.customConfig ?? null,
     tx_hash: input.txHash ?? null,
     proof_url: input.proofUrl ?? null,
   });
@@ -93,6 +95,7 @@ function fromRow(r: Record<string, unknown>): Payment {
     mt5Server: (r.mt5_server as string) ?? "",
     binanceApiKey: (r.binance_api_key as string) ?? "",
     binanceApiSecret: (r.binance_api_secret as string) ?? "",
+    customConfig: (r.custom_config as string) ?? "",
     txHash: (r.tx_hash as string) ?? "",
     proofUrl: (r.proof_url as string) ?? "",
     status: (r.status as PaymentStatus) ?? "pending",
