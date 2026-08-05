@@ -22,6 +22,42 @@ function T({ label, children }: { label: string; children: React.ReactNode }) {
   return (<div><label className={labelCls}>{label}</label>{children}</div>);
 }
 
+/** Resize/compress an image in the browser so uploads stay well under the server limit. */
+async function compressImage(file: File, maxDim = 1400, quality = 0.82): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const dataUrl: string = await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result as string);
+      fr.onerror = rej;
+      fr.readAsDataURL(file);
+    });
+    const img: HTMLImageElement = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = rej;
+      i.src = dataUrl;
+    });
+    let { width, height } = img;
+    if (Math.max(width, height) > maxDim) {
+      const scale = maxDim / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, width, height);
+    const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/jpeg", quality));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], (file.name.replace(/\.[^.]+$/, "") || "image") + ".jpg", { type: "image/jpeg" });
+  } catch {
+    return file;
+  }
+}
+
 function ImageField({
   name, label, existing, aspect,
 }: { name: string; label: string; existing?: string; aspect: string }) {
@@ -43,13 +79,21 @@ function ImageField({
             <ImagePlus className="size-4" /> Choose image
             <input
               type="file" name={name} accept="image/*" className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                setPreview(f ? URL.createObjectURL(f) : existing || null);
+              onChange={async (e) => {
+                const input = e.target;
+                const f = input.files?.[0];
+                if (!f) { setPreview(existing || null); return; }
+                const compressed = await compressImage(f);
+                try {
+                  const dt = new DataTransfer();
+                  dt.items.add(compressed);
+                  input.files = dt.files;
+                } catch {}
+                setPreview(URL.createObjectURL(compressed));
               }}
             />
           </label>
-          <p className="mt-1 text-xs text-muted">PNG/JPG, up to 5MB.</p>
+          <p className="mt-1 text-xs text-muted">PNG/JPG — auto-optimized on upload.</p>
         </div>
       </div>
     </div>
