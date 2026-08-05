@@ -20,6 +20,10 @@ export interface ProviderFormValues {
   accent: string;
   featured: boolean;
   verified: boolean;
+  demoServer: string;
+  demoLogin: string;
+  demoPassword: string;
+  demoPlatform: string;
 }
 
 export interface AdminProvider extends ProviderFormValues {
@@ -51,6 +55,10 @@ function toRow(v: ProviderFormValues) {
     accent: v.accent,
     featured: v.featured,
     verified: v.verified,
+    demo_server: v.demoServer,
+    demo_login: v.demoLogin,
+    demo_password: v.demoPassword,
+    demo_platform: v.demoPlatform,
   };
 }
 
@@ -74,6 +82,10 @@ function fromRow(r: Record<string, unknown>): AdminProvider {
     accent: (r.accent as string) ?? "linear-gradient(135deg,#22d3ee,#3b82f6)",
     featured: Boolean(r.featured),
     verified: Boolean(r.verified),
+    demoServer: (r.demo_server as string) ?? "",
+    demoLogin: (r.demo_login as string) ?? "",
+    demoPassword: (r.demo_password as string) ?? "",
+    demoPlatform: (r.demo_platform as string) ?? "",
   };
 }
 

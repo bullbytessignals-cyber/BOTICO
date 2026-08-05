@@ -69,6 +69,11 @@ export interface CopyProvider {
   accent: string;
   featured: boolean;
   verified: boolean;
+  // Live demo (investor / read-only) login so visitors can watch the bot trade
+  demoServer: string;
+  demoLogin: string;
+  demoPassword: string; // investor password — read-only, safe to show
+  demoPlatform: string; // MT4 | MT5 | cTrader
 }
 
 export interface PlatformStat {

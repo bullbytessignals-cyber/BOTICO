@@ -154,6 +154,10 @@ export async function getCopyProviders(): Promise<CopyProvider[]> {
     accent: (r.accent as string) ?? "linear-gradient(135deg,#22d3ee,#3b82f6)",
     featured: Boolean(r.featured),
     verified: Boolean(r.verified),
+    demoServer: (r.demo_server as string) ?? "",
+    demoLogin: (r.demo_login as string) ?? "",
+    demoPassword: (r.demo_password as string) ?? "",
+    demoPlatform: (r.demo_platform as string) ?? "",
   }));
 }
 

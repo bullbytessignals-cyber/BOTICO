@@ -110,6 +110,18 @@ export function ProviderForm({
         </div>
       </section>
 
+      {/* Live demo access */}
+      <section className="glass rounded-2xl p-6 space-y-4">
+        <h2 className="font-display font-semibold">Live demo access <span className="text-xs font-normal text-muted">(optional — lets visitors watch the bot trade)</span></h2>
+        <p className="text-xs text-muted">Provide a demo account&apos;s <span className="text-foreground">investor (read-only)</span> password. Visitors can log into MT4/MT5 with it to watch live trades — they cannot trade or withdraw. Leave blank to hide.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <T label="Platform"><input name="demoPlatform" defaultValue={provider?.demoPlatform} className={input} placeholder="MT5" /></T>
+          <T label="Server"><input name="demoServer" defaultValue={provider?.demoServer} className={input} placeholder="Exness-MT5Trial8" /></T>
+          <T label="Login (account #)"><input name="demoLogin" defaultValue={provider?.demoLogin} className={input} placeholder="12345678" /></T>
+          <T label="Investor password"><input name="demoPassword" defaultValue={provider?.demoPassword} className={input} placeholder="read-only pass" /></T>
+        </div>
+      </section>
+
       {/* Display */}
       <section className="glass rounded-2xl p-6 space-y-4">
         <h2 className="font-display font-semibold">Display</h2>

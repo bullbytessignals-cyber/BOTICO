@@ -71,6 +71,10 @@ async function parse(fd: FormData): Promise<ProviderFormValues | { error: string
     accent: String(fd.get("accent") ?? "linear-gradient(135deg,#22d3ee,#3b82f6)"),
     featured: fd.get("featured") === "on",
     verified: fd.get("verified") === "on",
+    demoServer: String(fd.get("demoServer") ?? "").trim(),
+    demoLogin: String(fd.get("demoLogin") ?? "").trim(),
+    demoPassword: String(fd.get("demoPassword") ?? "").trim(),
+    demoPlatform: String(fd.get("demoPlatform") ?? "").trim(),
   };
 }
 

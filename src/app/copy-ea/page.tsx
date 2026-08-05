@@ -144,6 +144,28 @@ export default async function CopyEAPage() {
                       {p.markets.map((m) => <Badge key={m}>{m}</Badge>)}
                     </div>
 
+                    {p.demoLogin && p.demoPassword && (
+                      <details className="mt-3 group/demo rounded-xl border border-success/30 bg-success/5 overflow-hidden">
+                        <summary className="flex items-center gap-2 px-3 py-2 cursor-pointer text-sm font-medium text-success list-none">
+                          <span className="relative flex size-2">
+                            <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 animate-ping" />
+                            <span className="relative inline-flex rounded-full size-2 bg-success" />
+                          </span>
+                          Watch it live — demo login
+                        </summary>
+                        <div className="px-3 pb-3 pt-1 space-y-1.5 text-xs">
+                          <p className="text-muted">Log into {p.demoPlatform || "MT4/MT5"} with these <span className="text-foreground">read-only</span> details to watch it trade live:</p>
+                          <div className="font-mono text-foreground space-y-0.5 rounded-lg bg-black/30 p-2.5 border border-border">
+                            {p.demoPlatform && <div><span className="text-muted">Platform: </span>{p.demoPlatform}</div>}
+                            {p.demoServer && <div><span className="text-muted">Server: </span>{p.demoServer}</div>}
+                            <div><span className="text-muted">Login: </span>{p.demoLogin}</div>
+                            <div><span className="text-muted">Investor pass: </span>{p.demoPassword}</div>
+                          </div>
+                          <p className="text-[10px] text-muted">Investor password is view-only — no trading or withdrawals possible.</p>
+                        </div>
+                      </details>
+                    )}
+
                     <div className="mt-4 pt-4 border-t border-border flex items-center justify-between mt-auto gap-2">
                       <div className="text-sm min-w-0">
                         <span className="font-semibold">{cprimary.price === 0 ? "Free" : formatUsd(cprimary.price)}</span>
