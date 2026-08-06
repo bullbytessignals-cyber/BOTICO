@@ -51,6 +51,7 @@ export default async function AdminCopyEAPage() {
                   </span>
                   {p.featured && <Badge variant="cyan"><Star className="size-3" /> Featured</Badge>}
                   {p.verified && <Badge variant="success"><ShieldCheck className="size-3" /> Verified</Badge>}
+                  {p.kind === "crypto" && <Badge variant="violet">Crypto</Badge>}
                 </div>
                 <div className="text-xs text-muted truncate">
                   {p.specialty || "—"} · {p.winRate}% accuracy · {formatCompact(p.copiers)} copiers
