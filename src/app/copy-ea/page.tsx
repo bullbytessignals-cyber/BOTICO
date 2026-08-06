@@ -52,7 +52,7 @@ export default async function CopyEAPage() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg">
-              <Link href="/marketplace?category=copy-ea">Browse Copy EAs <ArrowRight className="size-4" /></Link>
+              <Link href="#star-traders">Browse Copy EAs <ArrowRight className="size-4" /></Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
               <Link href="/custom-bot">Request a custom Copy EA</Link>
@@ -76,8 +76,40 @@ export default async function CopyEAPage() {
         ))}
       </div>
 
+      {/* Perks */}
+      <section className="mt-20 grid gap-4 sm:grid-cols-3">
+        {PERKS.map((p, i) => (
+          <Reveal key={p.title} delay={(i % 3) * 0.06}>
+            <div className="h-full rounded-[var(--radius)] glass p-6">
+              <span className="grid place-items-center size-11 rounded-xl bg-gradient-to-br from-cyan/20 to-blue/10 border border-cyan/20 text-cyan-bright">
+                <p.icon className="size-5" />
+              </span>
+              <h3 className="mt-4 font-display text-lg font-semibold">{p.title}</h3>
+              <p className="mt-2 text-sm text-muted leading-relaxed">{p.body}</p>
+            </div>
+          </Reveal>
+        ))}
+      </section>
+
+      {/* Copy EAs for sale */}
+      {copyBots.length > 0 && (
+        <section className="mt-20">
+          <Reveal>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">Copy EAs for sale</h2>
+            <p className="mt-2 text-muted">Buy once and start mirroring trades today.</p>
+          </Reveal>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {copyBots.map((bot, i) => (
+              <Reveal key={bot.slug} delay={(i % 3) * 0.08}>
+                <BotCard bot={bot} developerName={bot.developer} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Star traders */}
-      <section className="mt-20">
+      <section id="star-traders" className="scroll-mt-28 mt-20">
         <Reveal>
           <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">
             Star traders you can copy
@@ -189,38 +221,6 @@ export default async function CopyEAPage() {
         )}
       </section>
 
-      {/* Perks */}
-      <section className="mt-20 grid gap-4 sm:grid-cols-3">
-        {PERKS.map((p, i) => (
-          <Reveal key={p.title} delay={(i % 3) * 0.06}>
-            <div className="h-full rounded-[var(--radius)] glass p-6">
-              <span className="grid place-items-center size-11 rounded-xl bg-gradient-to-br from-cyan/20 to-blue/10 border border-cyan/20 text-cyan-bright">
-                <p.icon className="size-5" />
-              </span>
-              <h3 className="mt-4 font-display text-lg font-semibold">{p.title}</h3>
-              <p className="mt-2 text-sm text-muted leading-relaxed">{p.body}</p>
-            </div>
-          </Reveal>
-        ))}
-      </section>
-
-      {/* Copy EAs for sale */}
-      {copyBots.length > 0 && (
-        <section className="mt-20">
-          <Reveal>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">Copy EAs for sale</h2>
-            <p className="mt-2 text-muted">Buy once and start mirroring trades today.</p>
-          </Reveal>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {copyBots.map((bot, i) => (
-              <Reveal key={bot.slug} delay={(i % 3) * 0.08}>
-                <BotCard bot={bot} developerName={bot.developer} />
-              </Reveal>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* CTA */}
       <Reveal>
         <div className="mt-20 relative overflow-hidden rounded-[2rem] glass-strong px-8 py-14 sm:px-16 text-center">
@@ -235,7 +235,7 @@ export default async function CopyEAPage() {
               ))}
             </ul>
             <Button asChild size="lg" className="mt-7">
-              <Link href="/marketplace?category=copy-ea">Browse Copy EAs <ArrowRight className="size-4" /></Link>
+              <Link href="#star-traders">Browse Copy EAs <ArrowRight className="size-4" /></Link>
             </Button>
           </div>
         </div>
