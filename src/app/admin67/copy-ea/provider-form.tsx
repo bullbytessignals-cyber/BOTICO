@@ -109,6 +109,7 @@ export function ProviderForm({
 }) {
   const [state, formAction, pending] = useActionState<ProviderFormState, FormData>(action, {});
   const [accent, setAccent] = useState(provider?.accent ?? ACCENTS[0]);
+  const [kind, setKind] = useState<"forex" | "crypto">(provider?.kind ?? "forex");
 
   return (
     <form action={formAction} className="space-y-8">
@@ -119,6 +120,33 @@ export function ProviderForm({
       {/* Trader */}
       <section className="glass rounded-2xl p-6 space-y-4">
         <h2 className="font-display font-semibold">Trader</h2>
+
+        {/* Market type — shows a badge and drives what buyers submit at checkout */}
+        <div>
+          <label className={labelCls}>Market type</label>
+          <input type="hidden" name="kind" value={kind} />
+          <div className="grid grid-cols-2 gap-2 mt-1 max-w-md">
+            {([
+              { id: "forex", title: "Forex / MT", sub: "Buyer submits MT5 login" },
+              { id: "crypto", title: "Crypto", sub: "Buyer submits Binance API" },
+            ] as const).map((opt) => (
+              <button
+                type="button"
+                key={opt.id}
+                onClick={() => setKind(opt.id)}
+                className={`text-left px-4 py-3 rounded-xl border transition-colors ${
+                  kind === opt.id
+                    ? "border-cyan/50 bg-cyan/10 text-cyan-bright"
+                    : "border-border text-muted hover:text-foreground hover:bg-white/5"
+                }`}
+              >
+                <div className="text-sm font-semibold">{opt.title}</div>
+                <div className="text-xs text-muted mt-0.5">{opt.sub}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-2 gap-4">
           <T label="Trader name *"><input name="name" required defaultValue={provider?.name} className={input} placeholder="ICT Master" /></T>
           <T label="Slug (auto from name if blank)"><input name="slug" defaultValue={provider?.slug} className={input} placeholder="ict-master" /></T>

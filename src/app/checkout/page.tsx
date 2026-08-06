@@ -63,7 +63,7 @@ export default async function CheckoutPage({
         name: `${provider.name} — Copy EA`,
         amount,
         planLabel,
-        kind: "forex" as const,
+        kind: provider.kind,
         collectSetup: true,
         allowCustomConfig: true,
       };

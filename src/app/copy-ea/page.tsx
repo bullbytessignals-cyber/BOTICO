@@ -111,6 +111,11 @@ export default async function CopyEAPage() {
                         <Badge variant="cyan"><ShieldCheck className="size-3" /> Verified</Badge>
                       </span>
                     )}
+                    {p.kind === "crypto" && (
+                      <span className="absolute top-3 left-3">
+                        <Badge variant="violet">Crypto</Badge>
+                      </span>
+                    )}
                   </div>
 
                   <div className="p-6 -mt-8 relative flex flex-col flex-1">

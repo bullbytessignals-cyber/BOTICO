@@ -140,6 +140,7 @@ export async function getCopyProviders(): Promise<CopyProvider[]> {
   return (data as Record<string, unknown>[]).map((r) => ({
     slug: r.slug as string,
     name: r.name as string,
+    kind: (r.kind as BotKind) === "crypto" ? "crypto" : "forex",
     specialty: (r.specialty as string) ?? "",
     description: (r.description as string) ?? "",
     markets: (r.markets as string[]) ?? [],

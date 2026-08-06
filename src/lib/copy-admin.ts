@@ -1,4 +1,5 @@
 import { supabaseService } from "@/lib/supabase/server";
+import type { BotKind } from "@/lib/data/types";
 
 const BUCKET = "copy-ea";
 const TABLE = "copy_providers";
@@ -6,6 +7,7 @@ const TABLE = "copy_providers";
 export interface ProviderFormValues {
   slug: string;
   name: string;
+  kind: BotKind;
   specialty: string;
   description: string;
   markets: string[];
@@ -41,6 +43,7 @@ function toRow(v: ProviderFormValues) {
   return {
     slug: v.slug,
     name: v.name,
+    kind: v.kind,
     specialty: v.specialty,
     description: v.description,
     markets: v.markets,
@@ -68,6 +71,7 @@ function fromRow(r: Record<string, unknown>): AdminProvider {
     created_at: r.created_at as string,
     slug: r.slug as string,
     name: r.name as string,
+    kind: (r.kind as BotKind) === "crypto" ? "crypto" : "forex",
     specialty: (r.specialty as string) ?? "",
     description: (r.description as string) ?? "",
     markets: (r.markets as string[]) ?? [],

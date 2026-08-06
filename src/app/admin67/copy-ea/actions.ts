@@ -57,6 +57,7 @@ async function parse(fd: FormData): Promise<ProviderFormValues | { error: string
   return {
     slug,
     name,
+    kind: String(fd.get("kind") ?? "") === "crypto" ? "crypto" : "forex",
     specialty: String(fd.get("specialty") ?? "").trim(),
     description: String(fd.get("description") ?? "").trim(),
     markets: list(fd, "markets"),

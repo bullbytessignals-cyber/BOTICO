@@ -55,6 +55,7 @@ export interface Bot {
 export interface CopyProvider {
   slug: string;
   name: string; // trader name
+  kind: BotKind; // forex (MT) or crypto (Binance)
   specialty: string;
   description: string;
   markets: string[];
