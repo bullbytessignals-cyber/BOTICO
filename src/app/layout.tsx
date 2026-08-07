@@ -66,6 +66,11 @@ export default async function RootLayout({
       className={`${inter.variable} ${display.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`,
+          }}
+        />
         <Navbar isAuthed={Boolean(user)} />
         <main className="flex-1">{children}</main>
         <FooterGate>

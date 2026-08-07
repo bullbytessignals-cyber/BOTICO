@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 
 const LINKS = [
   { href: "/marketplace", label: "Marketplace" },
@@ -72,6 +73,7 @@ export function Navbar({ isAuthed = false }: { isAuthed?: boolean }) {
           </div>
 
           <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             {isAuthed ? (
               <Button asChild size="sm">
                 <Link href="/dashboard">My Account</Link>
@@ -88,13 +90,16 @@ export function Navbar({ isAuthed = false }: { isAuthed?: boolean }) {
             )}
           </div>
 
-          <button
-            className="md:hidden grid place-items-center size-10 rounded-full text-foreground hover:bg-white/5"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              className="grid place-items-center size-10 rounded-full text-foreground hover:bg-white/5"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
         </nav>
 
         {open && (
