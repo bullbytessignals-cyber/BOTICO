@@ -40,7 +40,7 @@ type BotRow = {
   rating: number; reviews: number; downloads: number;
   monthly_return: number; max_drawdown: number; win_rate: number; avg_rr: number;
   min_balance: number; recommended_risk: string; price_buy: number; price_rent: number; price_annual: number;
-  featured: boolean; verified: boolean; accent: string;
+  featured: boolean; verified: boolean; accent: string; file_path?: string | null;
 };
 
 function mapBot(r: BotRow): Bot {
@@ -69,6 +69,7 @@ function mapBot(r: BotRow): Bot {
     featured: r.featured,
     verified: r.verified,
     accent: r.accent,
+    hasFile: Boolean(r.file_path),
     equity: equityFromSlug(r.slug, Number(r.monthly_return)),
   };
 }

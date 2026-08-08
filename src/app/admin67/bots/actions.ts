@@ -10,6 +10,7 @@ import {
   deleteBot,
   setBotFlag,
   slugify,
+  uploadBotFile,
   type BotFormValues,
 } from "@/lib/bots-admin";
 
@@ -60,7 +61,18 @@ function parseForm(fd: FormData): BotFormValues {
     featured: fd.get("featured") === "on",
     verified: fd.get("verified") === "on",
     accent: String(fd.get("accent") ?? "linear-gradient(135deg,#22d3ee,#3b82f6)"),
+    filePath: String(fd.get("filePathExisting") ?? "").trim(),
   };
+}
+
+/** Upload a new MQL file if one was attached, returning the updated values. */
+async function withUploadedFile(fd: FormData, values: BotFormValues): Promise<BotFormValues> {
+  const file = fd.get("mqlFile") as File | null;
+  if (file && file.size > 0) {
+    const path = await uploadBotFile(file, values.slug);
+    if (path) return { ...values, filePath: path };
+  }
+  return values;
 }
 
 function revalidatePublic(slug?: string) {
@@ -77,8 +89,9 @@ export interface BotFormState {
 
 export async function createBotAction(_prev: BotFormState, fd: FormData): Promise<BotFormState> {
   await requireAdmin();
-  const values = parseForm(fd);
+  let values = parseForm(fd);
   if (!values.name || !values.slug) return { error: "Name is required." };
+  values = await withUploadedFile(fd, values);
   const res = await createBot(values);
   if (!res.ok) return { error: res.error };
   revalidatePublic(values.slug);
@@ -88,9 +101,10 @@ export async function createBotAction(_prev: BotFormState, fd: FormData): Promis
 export async function updateBotAction(_prev: BotFormState, fd: FormData): Promise<BotFormState> {
   await requireAdmin();
   const id = String(fd.get("id") ?? "");
-  const values = parseForm(fd);
+  let values = parseForm(fd);
   if (!id) return { error: "Missing bot id." };
   if (!values.name || !values.slug) return { error: "Name is required." };
+  values = await withUploadedFile(fd, values);
   const res = await updateBot(id, values);
   if (!res.ok) return { error: res.error };
   revalidatePublic(values.slug);

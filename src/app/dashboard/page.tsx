@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  Bot as BotIcon, Clock, DollarSign, Plug, Server, KeyRound, CheckCircle2, ExternalLink,
+  Bot as BotIcon, Clock, DollarSign, Plug, Server, KeyRound, CheckCircle2, ExternalLink, Download,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { signOutAction } from "@/lib/auth-actions";
+import { downloadBotFile } from "./download-actions";
 import { getBots } from "@/lib/data";
 import { listPaymentsByEmail, type Payment } from "@/lib/payments";
 import { listJournal, type JournalEntry } from "@/lib/journal";
@@ -133,6 +134,14 @@ export default async function DashboardPage() {
                       <div className="text-[10px] uppercase text-muted">paid</div>
                     </div>
                     <Badge variant={badge.variant}>{badge.label}</Badge>
+                    {p.status === "approved" && p.itemType === "bot" && p.itemPlan === "buy" && bot?.hasFile && (
+                      <form action={downloadBotFile}>
+                        <input type="hidden" name="slug" value={p.itemSlug} />
+                        <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium bg-cyan/15 text-cyan-bright hover:bg-cyan/25 transition-colors shrink-0">
+                          <Download className="size-4" /> EA file
+                        </button>
+                      </form>
+                    )}
                     {bot && (
                       <Link href={`/bots/${bot.slug}`} className="text-muted hover:text-cyan-bright shrink-0">
                         <ExternalLink className="size-4" />

@@ -65,6 +65,7 @@ export async function submitPayment(_prev: CheckoutState, fd: FormData): Promise
     itemSlug: get("itemSlug"),
     itemName: get("itemName") || "Order",
     itemKind,
+    itemPlan: get("itemPlan") || "buy",
     amount,
     coin,
     name,

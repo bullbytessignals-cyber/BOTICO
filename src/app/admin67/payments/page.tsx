@@ -72,6 +72,7 @@ export default async function AdminPaymentsPage() {
                         <h3 className="font-semibold">{p.itemName}</h3>
                         <Badge variant={meta.variant}>{meta.label}</Badge>
                         <Badge variant={isCrypto ? "violet" : "cyan"}>{isCrypto ? "Crypto" : "Forex"}</Badge>
+                        {p.itemPlan && <Badge>{p.itemPlan === "buy" ? "Buy · file" : p.itemPlan}</Badge>}
                         <span className="font-display font-bold text-lg">${p.amount.toFixed(2)}</span>
                         <Badge>{p.coin}</Badge>
                       </div>

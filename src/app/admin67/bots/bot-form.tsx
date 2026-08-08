@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, FileUp, FileCheck2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/data/seed-data";
 import type { AdminBot } from "@/lib/bots-admin";
@@ -35,6 +35,8 @@ export function BotForm({
   const [state, formAction, pending] = useActionState<BotFormState, FormData>(action, {});
   const [accent, setAccent] = useState(bot?.accent ?? ACCENTS[0]);
   const [kind, setKind] = useState<"forex" | "crypto">(bot?.kind ?? "forex");
+  const existingFile = bot?.filePath ? bot.filePath.split("/").pop() : "";
+  const [fileName, setFileName] = useState("");
 
   return (
     <form action={formAction} className="space-y-8">
@@ -147,6 +149,22 @@ export function BotForm({
             <input type="checkbox" name="verified" defaultChecked={bot?.verified} className="accent-cyan size-4" /> Verified badge
           </label>
         </div>
+      </section>
+
+      {/* Downloadable EA file — delivered to buyers after you approve their payment */}
+      <section className="glass rounded-2xl p-6 space-y-4">
+        <h2 className="font-display font-semibold">EA file (delivered on Buy)</h2>
+        <p className="text-xs text-muted">Upload the <span className="text-foreground">.mq5 / .ex5 / .zip</span> file. Buyers who choose <span className="text-foreground">Buy</span> get a secure download link after you approve their payment in Deposits. Renters don&apos;t get the file.</p>
+        <input type="hidden" name="filePathExisting" value={bot?.filePath ?? ""} />
+        <label className="flex items-center gap-2 h-11 px-4 rounded-lg bg-black/20 border border-border text-sm text-muted cursor-pointer hover:bg-white/5 max-w-md">
+          {fileName || existingFile ? <FileCheck2 className="size-4 text-success" /> : <FileUp className="size-4" />}
+          <span className="truncate">{fileName || existingFile || "Upload EA file (.mq5, .ex5, .zip)"}</span>
+          <input
+            type="file" name="mqlFile" accept=".mq5,.ex5,.mq4,.ex4,.zip,.set" className="hidden"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
+          />
+        </label>
+        {existingFile && !fileName && <p className="text-xs text-success">Current file: {existingFile}. Upload a new one to replace it.</p>}
       </section>
 
       {state.error && (

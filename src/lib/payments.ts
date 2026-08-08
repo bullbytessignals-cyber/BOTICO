@@ -9,6 +9,7 @@ export interface PaymentInput {
   itemSlug?: string;
   itemName: string;
   itemKind?: string; // forex | crypto
+  itemPlan?: string; // buy | rent | annual
   amount: number;
   coin: string;
   name: string;
@@ -57,6 +58,7 @@ export async function createPayment(input: PaymentInput): Promise<Result> {
     item_slug: input.itemSlug ?? null,
     item_name: input.itemName,
     item_kind: input.itemKind ?? "forex",
+    item_plan: input.itemPlan ?? "buy",
     amount: input.amount,
     coin: input.coin,
     name: input.name,
@@ -84,6 +86,7 @@ function fromRow(r: Record<string, unknown>): Payment {
     itemSlug: (r.item_slug as string) ?? "",
     itemName: (r.item_name as string) ?? "",
     itemKind: (r.item_kind as string) ?? "forex",
+    itemPlan: (r.item_plan as string) ?? "buy",
     amount: Number(r.amount ?? 0),
     coin: (r.coin as string) ?? "",
     name: (r.name as string) ?? "",

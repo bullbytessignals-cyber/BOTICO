@@ -20,6 +20,7 @@ interface Item {
   kind: "forex" | "crypto";
   collectSetup?: boolean; // false for custom builds (bot delivered later)
   allowCustomConfig?: boolean; // offer the +$10 custom configuration add-on
+  plan?: string; // buy | rent | annual
 }
 
 const input = "w-full h-11 px-4 rounded-xl bg-black/20 border border-border text-sm outline-none focus:ring-2 focus:ring-cyan/50 placeholder:text-muted/60";
@@ -150,6 +151,7 @@ export function CheckoutClient({
         <input type="hidden" name="itemSlug" value={item.slug} />
         <input type="hidden" name="itemName" value={item.name} />
         <input type="hidden" name="itemKind" value={item.kind} />
+        <input type="hidden" name="itemPlan" value={item.plan ?? ""} />
         <input type="hidden" name="collectSetup" value={collectSetup ? "1" : "0"} />
         <input type="hidden" name="amount" value={item.amount} />
         <input type="hidden" name="coin" value={method.label} />

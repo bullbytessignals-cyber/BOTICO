@@ -26,6 +26,7 @@ export interface BotFormValues {
   featured: boolean;
   verified: boolean;
   accent: string;
+  filePath: string; // MQL file in the private bot-files bucket (delivered on Buy)
 }
 
 export interface AdminBot extends BotFormValues {
@@ -65,6 +66,7 @@ function toRow(v: BotFormValues) {
     featured: v.featured,
     verified: v.verified,
     accent: v.accent,
+    file_path: v.filePath || null,
   };
 }
 
@@ -96,6 +98,7 @@ function fromRow(r: Record<string, unknown>): AdminBot {
     featured: Boolean(r.featured),
     verified: Boolean(r.verified),
     accent: (r.accent as string) ?? "",
+    filePath: (r.file_path as string) ?? "",
   };
 }
 
@@ -145,4 +148,42 @@ export async function setBotFlag(id: string, field: "featured" | "verified", val
   const { error } = await sb.from("bots").update({ [field]: value }).eq("id", id);
   if (error) return { ok: false, error: error.message };
   return { ok: true };
+}
+
+const FILE_BUCKET = "bot-files";
+
+/** Upload the MQL/EA file for a bot to the private bucket; returns its storage path. */
+export async function uploadBotFile(file: File, slug: string): Promise<string | null> {
+  const sb = supabaseService();
+  if (!sb || !file || file.size === 0) return null;
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = `${slug || "bot"}/${Date.now()}-${safeName}`;
+  const buf = Buffer.from(await file.arrayBuffer());
+  const { error } = await sb.storage.from(FILE_BUCKET).upload(path, buf, {
+    contentType: file.type || "application/octet-stream",
+    upsert: true,
+  });
+  if (error) return null;
+  return path;
+}
+
+/** A short-lived signed download URL for a bot's private file (used after ownership is verified). */
+export async function getBotFileSignedUrl(filePath: string): Promise<string | null> {
+  const sb = supabaseService();
+  if (!sb || !filePath) return null;
+  const name = filePath.split("/").pop() || "bot-file";
+  const { data, error } = await sb.storage
+    .from(FILE_BUCKET)
+    .createSignedUrl(filePath, 120, { download: name });
+  if (error || !data) return null;
+  return data.signedUrl;
+}
+
+/** Look up a bot's file path by slug (server-only). */
+export async function getBotFilePathBySlug(slug: string): Promise<string | null> {
+  const sb = supabaseService();
+  if (!sb) return null;
+  const { data, error } = await sb.from("bots").select("file_path").eq("slug", slug).maybeSingle();
+  if (error || !data) return null;
+  return (data.file_path as string) || null;
 }

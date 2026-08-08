@@ -49,6 +49,7 @@ export default async function CheckoutPage({
       planLabel: "Custom bot · one-time build",
       kind: "forex" as const,
       collectSetup: false,
+      plan: "buy",
     };
   } else if (type === "copy") {
     const provider = slug ? await getCopyProviderBySlug(slug) : null;
@@ -66,6 +67,7 @@ export default async function CheckoutPage({
         kind: provider.kind,
         collectSetup: true,
         allowCustomConfig: true,
+        plan,
       };
     }
   } else {
@@ -82,8 +84,11 @@ export default async function CheckoutPage({
         amount,
         planLabel,
         kind: bot.kind,
-        collectSetup: true,
+        // Buy = they download the EA file after approval (no MT5 needed).
+        // Rent/Annual = we install it, so collect their MT5/Binance.
+        collectSetup: plan !== "buy",
         allowCustomConfig: true,
+        plan,
       };
     }
   }
