@@ -26,6 +26,7 @@ export interface BotFormValues {
   featured: boolean;
   verified: boolean;
   accent: string;
+  featureUrl: string; // optional banner/feature image (public)
   filePath: string; // MQL file in the private bot-files bucket (delivered on Buy)
 }
 
@@ -66,6 +67,7 @@ function toRow(v: BotFormValues) {
     featured: v.featured,
     verified: v.verified,
     accent: v.accent,
+    feature_url: v.featureUrl || null,
     file_path: v.filePath || null,
   };
 }
@@ -98,6 +100,7 @@ function fromRow(r: Record<string, unknown>): AdminBot {
     featured: Boolean(r.featured),
     verified: Boolean(r.verified),
     accent: (r.accent as string) ?? "",
+    featureUrl: (r.feature_url as string) ?? "",
     filePath: (r.file_path as string) ?? "",
   };
 }
@@ -148,6 +151,23 @@ export async function setBotFlag(id: string, field: "featured" | "verified", val
   const { error } = await sb.from("bots").update({ [field]: value }).eq("id", id);
   if (error) return { ok: false, error: error.message };
   return { ok: true };
+}
+
+const IMAGE_BUCKET = "bot-images";
+
+/** Upload a bot's feature image to the public bucket; returns its public URL. */
+export async function uploadBotImage(file: File, slug: string): Promise<string | null> {
+  const sb = supabaseService();
+  if (!sb || !file || file.size === 0) return null;
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const path = `${slug || "bot"}/feature-${Date.now()}.${ext}`;
+  const buf = Buffer.from(await file.arrayBuffer());
+  const { error } = await sb.storage.from(IMAGE_BUCKET).upload(path, buf, {
+    contentType: file.type || "image/jpeg",
+    upsert: true,
+  });
+  if (error) return null;
+  return sb.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
 const FILE_BUCKET = "bot-files";

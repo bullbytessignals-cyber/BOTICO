@@ -72,7 +72,7 @@ export function MarketplaceClient({
         )}
       </button>
 
-      <div className="grid lg:grid-cols-[260px_1fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
       {/* Filters sidebar */}
       <aside className={cn(
         "lg:sticky lg:top-24 h-max space-y-6",
@@ -159,7 +159,7 @@ export function MarketplaceClient({
             No bots match your filters.
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((bot) => (
               <BotCard key={bot.slug} bot={bot} developerName={bot.developer} />
             ))}

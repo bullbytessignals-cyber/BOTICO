@@ -11,6 +11,7 @@ import {
   setBotFlag,
   slugify,
   uploadBotFile,
+  uploadBotImage,
   type BotFormValues,
 } from "@/lib/bots-admin";
 
@@ -61,18 +62,25 @@ function parseForm(fd: FormData): BotFormValues {
     featured: fd.get("featured") === "on",
     verified: fd.get("verified") === "on",
     accent: String(fd.get("accent") ?? "linear-gradient(135deg,#22d3ee,#3b82f6)"),
+    featureUrl: String(fd.get("featureUrlExisting") ?? "").trim(),
     filePath: String(fd.get("filePathExisting") ?? "").trim(),
   };
 }
 
-/** Upload a new MQL file if one was attached, returning the updated values. */
+/** Upload a new MQL file and/or feature image if attached, returning updated values. */
 async function withUploadedFile(fd: FormData, values: BotFormValues): Promise<BotFormValues> {
+  let out = values;
   const file = fd.get("mqlFile") as File | null;
   if (file && file.size > 0) {
-    const path = await uploadBotFile(file, values.slug);
-    if (path) return { ...values, filePath: path };
+    const path = await uploadBotFile(file, out.slug);
+    if (path) out = { ...out, filePath: path };
   }
-  return values;
+  const img = fd.get("featureImage") as File | null;
+  if (img && img.size > 0) {
+    const url = await uploadBotImage(img, out.slug);
+    if (url) out = { ...out, featureUrl: url };
+  }
+  return out;
 }
 
 function revalidatePublic(slug?: string) {

@@ -32,6 +32,10 @@ export function BotCard({ bot, developerName }: { bot: Bot; developerName: strin
     >
       {/* accent header */}
       <div className="relative h-24 overflow-hidden" style={{ background: bot.accent }}>
+        {bot.featureUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={bot.featureUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        )}
         <div className="absolute inset-0 opacity-40 grid-bg" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface/90 to-transparent" />
         <div className="absolute top-3 left-4 right-4 flex items-center justify-between">

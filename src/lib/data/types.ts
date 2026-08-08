@@ -49,6 +49,7 @@ export interface Bot {
   featured: boolean;
   verified: boolean;
   accent: string; // gradient css
+  featureUrl: string; // optional banner/feature image
   hasFile: boolean; // an EA file is available to download on Buy
   equity: EquityPoint[];
 }
