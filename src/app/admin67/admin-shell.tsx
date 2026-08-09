@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Bot, Copy, Inbox, Wallet, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Bot, Copy, Inbox, Wallet, Star, LogOut, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin67/bots", label: "Bots", icon: Bot, exact: false },
   { href: "/admin67/copy-ea", label: "Copy EA", icon: Copy, exact: false },
   { href: "/admin67/payments", label: "Deposits", icon: Wallet, exact: false },
+  { href: "/admin67/reviews", label: "Reviews", icon: Star, exact: false },
   { href: "/admin67/orders", label: "Custom Orders", icon: Inbox, exact: false },
 ];
 

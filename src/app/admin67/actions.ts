@@ -11,6 +11,7 @@ import {
 } from "@/lib/orders";
 import { setPaymentStatus } from "@/lib/payments";
 import type { PaymentStatus } from "@/lib/payments-config";
+import { setReviewStatus, deleteReview, type ReviewStatus } from "@/lib/reviews";
 
 const COOKIE = "botico_admin";
 const MAX_AGE = 60 * 60 * 8; // 8 hours
@@ -71,4 +72,23 @@ export async function adminSetPaymentStatus(formData: FormData) {
   }
   revalidatePath("/admin67/payments");
   redirect("/admin67/payments");
+}
+
+export async function adminSetReviewStatus(formData: FormData) {
+  const store = await cookies();
+  if (!verifyAdminPassword(store.get(COOKIE)?.value ?? "")) redirect("/admin67");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "") as ReviewStatus;
+  if (id && status) await setReviewStatus(id, status);
+  revalidatePath("/admin67/reviews");
+  redirect("/admin67/reviews");
+}
+
+export async function adminDeleteReview(formData: FormData) {
+  const store = await cookies();
+  if (!verifyAdminPassword(store.get(COOKIE)?.value ?? "")) redirect("/admin67");
+  const id = String(formData.get("id") ?? "");
+  if (id) await deleteReview(id);
+  revalidatePath("/admin67/reviews");
+  redirect("/admin67/reviews");
 }

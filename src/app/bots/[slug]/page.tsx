@@ -6,10 +6,12 @@ import {
   TrendingUp, ArrowLeft, Check,
 } from "lucide-react";
 import { getBotBySlug, getBots, getDeveloper } from "@/lib/data";
+import { listApprovedReviews } from "@/lib/reviews";
 import { Sparkline } from "@/components/bots/sparkline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCompact, formatUsd } from "@/lib/utils";
+import { ReviewForm } from "./review-form";
 
 export async function generateStaticParams() {
   const bots = await getBots();
@@ -52,6 +54,11 @@ export default async function BotDetailPage({
   if (!bot) notFound();
 
   const developer = await getDeveloper(bot.developer);
+  const reviews = await listApprovedReviews(slug);
+  const reviewAvg = reviews.length
+    ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length
+    : bot.rating;
+  const reviewCount = reviews.length;
   const finalEquity = bot.equity[bot.equity.length - 1]?.v ?? 0;
   const startEquity = bot.equity[0]?.v ?? 1;
   const totalReturn = ((finalEquity - startEquity) / startEquity) * 100;
@@ -188,6 +195,45 @@ export default async function BotDetailPage({
                 </li>
               ))}
             </ol>
+          </div>
+
+          {/* Reviews */}
+          <div className="mt-6 rounded-[var(--radius)] glass p-6 sm:p-8">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <h3 className="font-display text-xl font-semibold">Reviews</h3>
+              <div className="flex items-center gap-2">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <Star key={n} className={`size-4 ${reviewAvg >= n - 0.25 ? "fill-warning text-warning" : "text-muted/40"}`} />
+                  ))}
+                </div>
+                <span className="text-sm font-semibold">{reviewAvg.toFixed(1)}</span>
+                <span className="text-sm text-muted">({reviewCount || formatCompact(bot.reviews)})</span>
+              </div>
+            </div>
+
+            {reviews.length > 0 && (
+              <div className="mt-5 space-y-4">
+                {reviews.map((r) => (
+                  <div key={r.id} className="border-t border-border pt-4 first:border-0 first:pt-0">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-medium">{r.name}</span>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star key={n} className={`size-3.5 ${r.rating >= n ? "fill-warning text-warning" : "text-muted/40"}`} />
+                        ))}
+                      </div>
+                    </div>
+                    {r.comment && <p className="mt-1.5 text-sm text-muted">{r.comment}</p>}
+                    <div className="mt-1 text-xs text-muted/70">{new Date(r.created_at).toLocaleDateString()}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6">
+              <ReviewForm botSlug={bot.slug} />
+            </div>
           </div>
         </div>
 
