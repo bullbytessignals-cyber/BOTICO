@@ -41,6 +41,7 @@ type BotRow = {
   monthly_return: number; max_drawdown: number; win_rate: number; avg_rr: number;
   min_balance: number; recommended_risk: string; price_buy: number; price_rent: number; price_annual: number;
   featured: boolean; verified: boolean; accent: string; feature_url?: string | null; file_path?: string | null;
+  delivery?: string | null; demo_server?: string | null; demo_login?: string | null; demo_password?: string | null; demo_platform?: string | null;
 };
 
 function mapBot(r: BotRow): Bot {
@@ -71,6 +72,11 @@ function mapBot(r: BotRow): Bot {
     accent: r.accent,
     featureUrl: (r.feature_url as string) ?? "",
     hasFile: Boolean(r.file_path),
+    delivery: (r.delivery as string) === "managed" ? "managed" : "file",
+    demoServer: (r.demo_server as string) ?? "",
+    demoLogin: (r.demo_login as string) ?? "",
+    demoPassword: (r.demo_password as string) ?? "",
+    demoPlatform: (r.demo_platform as string) ?? "",
     equity: equityFromSlug(r.slug, Number(r.monthly_return)),
   };
 }

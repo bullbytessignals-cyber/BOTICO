@@ -134,7 +134,7 @@ export default async function DashboardPage() {
                       <div className="text-[10px] uppercase text-muted">paid</div>
                     </div>
                     <Badge variant={badge.variant}>{badge.label}</Badge>
-                    {p.status === "approved" && p.itemType === "bot" && p.itemPlan === "buy" && bot?.hasFile && (
+                    {p.status === "approved" && p.itemType === "bot" && p.itemPlan === "buy" && bot?.delivery === "file" && bot?.hasFile && (
                       <form action={downloadBotFile}>
                         <input type="hidden" name="slug" value={p.itemSlug} />
                         <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium bg-cyan/15 text-cyan-bright hover:bg-cyan/25 transition-colors shrink-0">

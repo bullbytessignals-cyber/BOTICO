@@ -51,6 +51,11 @@ export interface Bot {
   accent: string; // gradient css
   featureUrl: string; // optional banner/feature image
   hasFile: boolean; // an EA file is available to download on Buy
+  delivery: "file" | "managed"; // file = buyer downloads · managed = we install on their MT5
+  demoServer: string;
+  demoLogin: string;
+  demoPassword: string; // investor / read-only
+  demoPlatform: string;
   equity: EquityPoint[];
 }
 

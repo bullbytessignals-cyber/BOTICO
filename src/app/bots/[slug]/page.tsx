@@ -179,16 +179,49 @@ export default async function BotDetailPage({
             </div>
           </div>
 
+          {/* Watch it live — demo (investor) login */}
+          {bot.demoLogin && bot.demoPassword && (
+            <details className="mt-6 rounded-[var(--radius)] border border-success/30 bg-success/5 overflow-hidden">
+              <summary className="flex items-center gap-2.5 px-6 py-4 cursor-pointer font-semibold text-success list-none">
+                <span className="relative flex size-2.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 animate-ping" />
+                  <span className="relative inline-flex rounded-full size-2.5 bg-success" />
+                </span>
+                Watch it live — demo login
+              </summary>
+              <div className="px-6 pb-5 space-y-2 text-sm">
+                <p className="text-muted">Log into {bot.demoPlatform || "MT4/MT5"} with these <span className="text-foreground">read-only</span> details to watch this bot trade live:</p>
+                <div className="font-mono text-foreground space-y-1 rounded-xl bg-black/30 p-4 border border-border max-w-md">
+                  {bot.demoPlatform && <div><span className="text-muted">Platform: </span>{bot.demoPlatform}</div>}
+                  {bot.demoServer && <div><span className="text-muted">Server: </span>{bot.demoServer}</div>}
+                  <div><span className="text-muted">Login: </span>{bot.demoLogin}</div>
+                  <div><span className="text-muted">Investor pass: </span>{bot.demoPassword}</div>
+                </div>
+                <p className="text-xs text-muted">Investor password is view-only — no trading or withdrawals possible.</p>
+              </div>
+            </details>
+          )}
+
           {/* Installation */}
           <div className="mt-6 rounded-[var(--radius)] glass p-6 sm:p-8">
-            <h3 className="font-display text-xl font-semibold">Installation guide</h3>
+            <h3 className="font-display text-xl font-semibold">
+              {bot.delivery === "managed" ? "How setup works" : "Installation guide"}
+            </h3>
             <ol className="mt-4 space-y-3">
-              {[
-                "Choose Buy or Rent and complete secure checkout.",
-                "Download your bot files and license key instantly.",
-                "Drop the EA into your MT4/MT5, cTrader or exchange account.",
-                "Apply the recommended risk preset and you're live.",
-              ].map((step, i) => (
+              {(bot.delivery === "managed"
+                ? [
+                    "Choose Buy or Rent and complete secure checkout.",
+                    "Submit your MT5 login, password and server at checkout.",
+                    "Our team installs & configures the EA on your account.",
+                    "You're live — nothing to download or set up yourself.",
+                  ]
+                : [
+                    "Choose Buy or Rent and complete secure checkout.",
+                    "After approval, download your EA file from your dashboard.",
+                    "Drop the EA into your MT4/MT5, cTrader or exchange account.",
+                    "Apply the recommended risk preset and you're live.",
+                  ]
+              ).map((step, i) => (
                 <li key={i} className="flex gap-3 text-sm">
                   <span className="grid place-items-center size-6 shrink-0 rounded-full bg-cyan/15 text-cyan-bright text-xs font-semibold">{i + 1}</span>
                   <span className="text-muted">{step}</span>

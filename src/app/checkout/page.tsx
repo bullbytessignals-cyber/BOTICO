@@ -84,9 +84,9 @@ export default async function CheckoutPage({
         amount,
         planLabel,
         kind: bot.kind,
-        // Buy = they download the EA file after approval (no MT5 needed).
-        // Rent/Annual = we install it, so collect their MT5/Binance.
-        collectSetup: plan !== "buy",
+        // Managed bots: always collect MT5 (we install), even on Buy.
+        // File bots: Buy downloads the file (no MT5); Rent/Annual collect MT5.
+        collectSetup: bot.delivery === "managed" ? true : plan !== "buy",
         allowCustomConfig: true,
         plan,
       };

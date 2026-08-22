@@ -28,6 +28,11 @@ export interface BotFormValues {
   accent: string;
   featureUrl: string; // optional banner/feature image (public)
   filePath: string; // MQL file in the private bot-files bucket (delivered on Buy)
+  delivery: "file" | "managed"; // file = buyer downloads · managed = we install on their MT5
+  demoServer: string;
+  demoLogin: string;
+  demoPassword: string; // investor / read-only password
+  demoPlatform: string;
 }
 
 export interface AdminBot extends BotFormValues {
@@ -69,6 +74,11 @@ function toRow(v: BotFormValues) {
     accent: v.accent,
     feature_url: v.featureUrl || null,
     file_path: v.filePath || null,
+    delivery: v.delivery,
+    demo_server: v.demoServer || null,
+    demo_login: v.demoLogin || null,
+    demo_password: v.demoPassword || null,
+    demo_platform: v.demoPlatform || null,
   };
 }
 
@@ -102,6 +112,11 @@ function fromRow(r: Record<string, unknown>): AdminBot {
     accent: (r.accent as string) ?? "",
     featureUrl: (r.feature_url as string) ?? "",
     filePath: (r.file_path as string) ?? "",
+    delivery: (r.delivery as string) === "managed" ? "managed" : "file",
+    demoServer: (r.demo_server as string) ?? "",
+    demoLogin: (r.demo_login as string) ?? "",
+    demoPassword: (r.demo_password as string) ?? "",
+    demoPlatform: (r.demo_platform as string) ?? "",
   };
 }
 

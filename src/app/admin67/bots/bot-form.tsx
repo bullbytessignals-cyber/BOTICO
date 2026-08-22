@@ -74,6 +74,7 @@ export function BotForm({
   const existingFile = bot?.filePath ? bot.filePath.split("/").pop() : "";
   const [fileName, setFileName] = useState("");
   const [imgPreview, setImgPreview] = useState<string | null>(bot?.featureUrl || null);
+  const [delivery, setDelivery] = useState<"file" | "managed">(bot?.delivery ?? "file");
 
   return (
     <form action={formAction} className="space-y-8">
@@ -219,20 +220,63 @@ export function BotForm({
         </div>
       </section>
 
-      {/* Downloadable EA file — delivered to buyers after you approve their payment */}
+      {/* Delivery mode */}
       <section className="glass rounded-2xl p-6 space-y-4">
-        <h2 className="font-display font-semibold">EA file (delivered on Buy)</h2>
-        <p className="text-xs text-muted">Upload the <span className="text-foreground">.mq5 / .ex5 / .zip</span> file. Buyers who choose <span className="text-foreground">Buy</span> get a secure download link after you approve their payment in Deposits. Renters don&apos;t get the file.</p>
-        <input type="hidden" name="filePathExisting" value={bot?.filePath ?? ""} />
-        <label className="flex items-center gap-2 h-11 px-4 rounded-lg bg-black/20 border border-border text-sm text-muted cursor-pointer hover:bg-white/5 max-w-md">
-          {fileName || existingFile ? <FileCheck2 className="size-4 text-success" /> : <FileUp className="size-4" />}
-          <span className="truncate">{fileName || existingFile || "Upload EA file (.mq5, .ex5, .zip)"}</span>
-          <input
-            type="file" name="mqlFile" accept=".mq5,.ex5,.mq4,.ex4,.zip,.set" className="hidden"
-            onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
-          />
-        </label>
-        {existingFile && !fileName && <p className="text-xs text-success">Current file: {existingFile}. Upload a new one to replace it.</p>}
+        <h2 className="font-display font-semibold">Delivery</h2>
+        <input type="hidden" name="delivery" value={delivery} />
+        <div className="grid sm:grid-cols-2 gap-2">
+          {([
+            { id: "file", title: "Downloadable file", sub: "Buyer downloads the EA after approval" },
+            { id: "managed", title: "Managed — we install", sub: "Buyer submits MT5 login; you install it" },
+          ] as const).map((opt) => (
+            <button
+              type="button"
+              key={opt.id}
+              onClick={() => setDelivery(opt.id)}
+              className={`text-left px-4 py-3 rounded-xl border transition-colors ${
+                delivery === opt.id ? "border-cyan/50 bg-cyan/10 text-cyan-bright" : "border-border text-muted hover:text-foreground hover:bg-white/5"
+              }`}
+            >
+              <div className="text-sm font-semibold">{opt.title}</div>
+              <div className="text-xs text-muted mt-0.5">{opt.sub}</div>
+            </button>
+          ))}
+        </div>
+
+        {delivery === "file" ? (
+          <div className="pt-1">
+            <p className="text-xs text-muted mb-2">Upload the <span className="text-foreground">.mq5 / .ex5 / .zip</span>. Buyers get a secure download link after you approve their payment. Renters submit MT5 instead.</p>
+            <input type="hidden" name="filePathExisting" value={bot?.filePath ?? ""} />
+            <label className="flex items-center gap-2 h-11 px-4 rounded-lg bg-black/20 border border-border text-sm text-muted cursor-pointer hover:bg-white/5 max-w-md">
+              {fileName || existingFile ? <FileCheck2 className="size-4 text-success" /> : <FileUp className="size-4" />}
+              <span className="truncate">{fileName || existingFile || "Upload EA file (.mq5, .ex5, .zip)"}</span>
+              <input
+                type="file" name="mqlFile" accept=".mq5,.ex5,.mq4,.ex4,.zip,.set" className="hidden"
+                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
+              />
+            </label>
+            {existingFile && !fileName && <p className="text-xs text-success mt-1">Current file: {existingFile}. Upload a new one to replace it.</p>}
+          </div>
+        ) : (
+          <div className="pt-1">
+            <input type="hidden" name="filePathExisting" value={bot?.filePath ?? ""} />
+            <p className="text-xs text-muted rounded-lg border border-cyan/30 bg-cyan/5 p-3">
+              Managed mode: <span className="text-foreground">every buyer (Buy &amp; Rent) submits their MT5 login/server/password at checkout</span> — no file is shared. You install &amp; configure it on their account after approving the payment.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Live demo access (investor / read-only login) */}
+      <section className="glass rounded-2xl p-6 space-y-4">
+        <h2 className="font-display font-semibold">Live demo access <span className="text-xs font-normal text-muted">(optional)</span></h2>
+        <p className="text-xs text-muted">Give a demo account&apos;s <span className="text-foreground">investor (read-only)</span> login so visitors can watch this bot trade live before buying. Leave blank to hide.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <T label="Platform"><input name="demoPlatform" defaultValue={bot?.demoPlatform} className={input} placeholder="MT5" /></T>
+          <T label="Server"><input name="demoServer" defaultValue={bot?.demoServer} className={input} placeholder="Exness-MT5Trial8" /></T>
+          <T label="Login"><input name="demoLogin" defaultValue={bot?.demoLogin} className={input} placeholder="12345678" /></T>
+          <T label="Investor password"><input name="demoPassword" defaultValue={bot?.demoPassword} className={input} placeholder="read-only pass" /></T>
+        </div>
       </section>
 
       {state.error && (
