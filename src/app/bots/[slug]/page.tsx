@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Star, Download, ShieldCheck, Server, Wallet, Gauge, Target,
-  TrendingUp, ArrowLeft, Check,
+  TrendingUp, ArrowLeft, Check, ChevronDown,
 } from "lucide-react";
 import { getBotBySlug, getBots, getDeveloper } from "@/lib/data";
 import { listApprovedReviews } from "@/lib/reviews";
@@ -181,13 +181,14 @@ export default async function BotDetailPage({
 
           {/* Watch it live — demo (investor) login */}
           {bot.demoLogin && bot.demoPassword && (
-            <details className="mt-6 rounded-[var(--radius)] border border-success/30 bg-success/5 overflow-hidden">
+            <details className="group mt-6 rounded-[var(--radius)] border border-success/30 bg-success/5 overflow-hidden">
               <summary className="flex items-center gap-2.5 px-6 py-4 cursor-pointer font-semibold text-success list-none">
                 <span className="relative flex size-2.5">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 animate-ping" />
                   <span className="relative inline-flex rounded-full size-2.5 bg-success" />
                 </span>
                 Watch it live — demo login
+                <ChevronDown className="demo-chevron size-5 ml-auto" />
               </summary>
               <div className="px-6 pb-5 space-y-2 text-sm">
                 <p className="text-muted">Log into {bot.demoPlatform || "MT4/MT5"} with these <span className="text-foreground">read-only</span> details to watch this bot trade live:</p>
@@ -276,6 +277,12 @@ export default async function BotDetailPage({
             <div className="flex items-baseline justify-between">
               <div>
                 <div className="text-xs uppercase tracking-wide text-muted">{primary.label}</div>
+                {primary.plan === "buy" && bot.priceOriginal > primary.price && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted line-through">{formatUsd(bot.priceOriginal)}</span>
+                    <Badge variant="success">{Math.round((1 - primary.price / bot.priceOriginal) * 100)}% OFF</Badge>
+                  </div>
+                )}
                 <div className="font-display text-3xl font-bold">
                   {primary.price === 0 ? "Free" : formatUsd(primary.price)}
                   <span className="text-sm text-muted font-normal"> {primary.suffix}</span>

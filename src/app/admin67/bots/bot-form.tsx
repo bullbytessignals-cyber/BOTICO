@@ -193,12 +193,13 @@ export function BotForm({
       {/* Pricing & display */}
       <section className="glass rounded-2xl p-6 space-y-4">
         <h2 className="font-display font-semibold">Pricing &amp; display</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <T label="Buy price ($, 0 = not for sale)"><input name="priceBuy" type="number" defaultValue={bot?.priceBuy} className={input} placeholder="899" /></T>
           <T label="Rent price ($/mo, 0 = off)"><input name="priceRent" type="number" defaultValue={bot?.priceRent} className={input} placeholder="79" /></T>
           <T label="Annual price ($/yr, 0 = off)"><input name="priceAnnual" type="number" defaultValue={bot?.priceAnnual} className={input} placeholder="699" /></T>
+          <T label="Original / was price ($, 0 = off)"><input name="priceOriginal" type="number" defaultValue={bot?.priceOriginal} className={input} placeholder="1299" /></T>
         </div>
-        <p className="text-xs text-muted">Set any price to <span className="text-foreground">0</span> to hide that option. e.g. leave Buy at 0 if the bot is rent/subscription only.</p>
+        <p className="text-xs text-muted">Set any price to <span className="text-foreground">0</span> to hide that option. The <span className="text-foreground">Original / was price</span> shows struck-through next to the Buy price with a discount % — set it higher than the Buy price.</p>
         <div>
           <label className={labelCls}>Accent colour</label>
           <input type="hidden" name="accent" value={accent} />

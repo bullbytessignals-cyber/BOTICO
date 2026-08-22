@@ -23,6 +23,7 @@ export interface BotFormValues {
   priceBuy: number;
   priceRent: number;
   priceAnnual: number;
+  priceOriginal: number; // "was" / compare-at price (0 = off) — shown struck-through
   featured: boolean;
   verified: boolean;
   accent: string;
@@ -69,6 +70,7 @@ function toRow(v: BotFormValues) {
     price_buy: v.priceBuy,
     price_rent: v.priceRent,
     price_annual: v.priceAnnual,
+    price_original: v.priceOriginal,
     featured: v.featured,
     verified: v.verified,
     accent: v.accent,
@@ -107,6 +109,7 @@ function fromRow(r: Record<string, unknown>): AdminBot {
     priceBuy: Number(r.price_buy ?? 0),
     priceRent: Number(r.price_rent ?? 0),
     priceAnnual: Number(r.price_annual ?? 0),
+    priceOriginal: Number(r.price_original ?? 0),
     featured: Boolean(r.featured),
     verified: Boolean(r.verified),
     accent: (r.accent as string) ?? "",

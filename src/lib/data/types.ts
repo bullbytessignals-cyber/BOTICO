@@ -46,6 +46,7 @@ export interface Bot {
   priceBuy: number; // one-time permanent license (0 = not for permanent sale)
   priceRent: number; // per month
   priceAnnual: number; // per year (0 = no annual plan)
+  priceOriginal: number; // "was" price (0 = off) — shown struck-through
   featured: boolean;
   verified: boolean;
   accent: string; // gradient css

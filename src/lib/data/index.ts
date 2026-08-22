@@ -39,7 +39,7 @@ type BotRow = {
   categories: string[]; platforms: string[]; assets: string[];
   rating: number; reviews: number; downloads: number;
   monthly_return: number; max_drawdown: number; win_rate: number; avg_rr: number;
-  min_balance: number; recommended_risk: string; price_buy: number; price_rent: number; price_annual: number;
+  min_balance: number; recommended_risk: string; price_buy: number; price_rent: number; price_annual: number; price_original?: number | null;
   featured: boolean; verified: boolean; accent: string; feature_url?: string | null; file_path?: string | null;
   delivery?: string | null; demo_server?: string | null; demo_login?: string | null; demo_password?: string | null; demo_platform?: string | null;
 };
@@ -67,6 +67,7 @@ function mapBot(r: BotRow): Bot {
     priceBuy: r.price_buy,
     priceRent: r.price_rent,
     priceAnnual: Number(r.price_annual ?? 0),
+    priceOriginal: Number(r.price_original ?? 0),
     featured: r.featured,
     verified: r.verified,
     accent: r.accent,

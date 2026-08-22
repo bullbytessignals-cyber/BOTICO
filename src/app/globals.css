@@ -181,6 +181,10 @@ body {
 /* Reveal on scroll base state handled by component; fallback keyframe */
 .animate-rise { animation: var(--animate-rise); }
 
+/* Rotating chevron for <details> disclosures */
+.demo-chevron { transition: transform 0.3s var(--ease-out-expo); }
+details[open] .demo-chevron { transform: rotate(180deg); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

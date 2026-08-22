@@ -92,16 +92,21 @@ export function BotCard({ bot, developerName }: { bot: Bot; developerName: strin
         <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted">Pricing</div>
-            <div className="text-base font-semibold">
-              {bot.priceBuy > 0
-                ? formatUsd(bot.priceBuy)
-                : bot.priceRent > 0
-                ? <>{formatUsd(bot.priceRent)}<span className="text-muted font-normal text-sm">/mo</span></>
-                : bot.priceAnnual > 0
-                ? <>{formatUsd(bot.priceAnnual)}<span className="text-muted font-normal text-sm">/yr</span></>
-                : "Free"}
+            <div className="text-base font-semibold flex items-baseline gap-1.5 flex-wrap">
+              {bot.priceBuy > 0 && bot.priceOriginal > bot.priceBuy && (
+                <span className="text-sm text-muted line-through font-normal">{formatUsd(bot.priceOriginal)}</span>
+              )}
+              <span>
+                {bot.priceBuy > 0
+                  ? formatUsd(bot.priceBuy)
+                  : bot.priceRent > 0
+                  ? <>{formatUsd(bot.priceRent)}<span className="text-muted font-normal text-sm">/mo</span></>
+                  : bot.priceAnnual > 0
+                  ? <>{formatUsd(bot.priceAnnual)}<span className="text-muted font-normal text-sm">/yr</span></>
+                  : "Free"}
+              </span>
               {bot.priceBuy > 0 && bot.priceRent > 0 && (
-                <span className="text-muted font-normal text-sm"> · {formatUsd(bot.priceRent)}/mo</span>
+                <span className="text-muted font-normal text-sm">· {formatUsd(bot.priceRent)}/mo</span>
               )}
             </div>
           </div>

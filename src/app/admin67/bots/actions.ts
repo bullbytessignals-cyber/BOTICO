@@ -59,6 +59,7 @@ function parseForm(fd: FormData): BotFormValues {
     priceBuy: Math.round(num(fd, "priceBuy")),
     priceRent: Math.round(num(fd, "priceRent")),
     priceAnnual: Math.round(num(fd, "priceAnnual")),
+    priceOriginal: Math.round(num(fd, "priceOriginal")),
     featured: fd.get("featured") === "on",
     verified: fd.get("verified") === "on",
     accent: String(fd.get("accent") ?? "linear-gradient(135deg,#22d3ee,#3b82f6)"),

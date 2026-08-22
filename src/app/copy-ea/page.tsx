@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Copy, Link2, Zap, ShieldCheck, SlidersHorizontal, Gauge, ArrowRight, Check,
+  Copy, Link2, Zap, ShieldCheck, SlidersHorizontal, Gauge, ArrowRight, Check, ChevronDown,
 } from "lucide-react";
 import { getCopyProviders, getBots } from "@/lib/data";
 import { BotCard } from "@/components/bots/bot-card";
@@ -142,6 +142,7 @@ export default async function CopyEAPage() {
                             <span className="relative inline-flex rounded-full size-2 bg-success" />
                           </span>
                           Watch it live — demo login
+                          <ChevronDown className="demo-chevron size-4 ml-auto" />
                         </summary>
                         <div className="px-3 pb-3 pt-1 space-y-1.5 text-xs">
                           <p className="text-muted">Log into {p.demoPlatform || "MT4/MT5"} with these <span className="text-foreground">read-only</span> details to watch it trade live:</p>
